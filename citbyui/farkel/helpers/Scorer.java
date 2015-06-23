@@ -33,7 +33,7 @@ public class Scorer {
 			ArrayList<Integer> left = choice.getLeft();
 			while(left.contains(1)){
 				oldChoices.add(choice.clone());
-				left = choice.addPoints(1, 50);
+				left = choice.addPoints(1, 100);
 			}
 			while(left.contains(5)){
 				oldChoices.add(choice.clone());
