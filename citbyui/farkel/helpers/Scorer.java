@@ -12,9 +12,9 @@ public class Scorer {
 		ArrayList<Opportunity> choices = new ArrayList<Opportunity>();
 		ArrayList<Integer> dice = convertRoll(roll);
 		if (dice.size() == 6) {
-			ArrayList<Opportunity> option = checkSix(dice);
-			if (option != null) {
-				return option;
+			Opportunity choice = checkSix(dice);
+			if(choice != null){
+				choices.add(choice);
 			}
 		}
 		for (int i = 5; i >= 3; i--) {
@@ -118,13 +118,12 @@ public class Scorer {
 		return null;
 	}
 
-	public static ArrayList<Opportunity> checkSix(ArrayList<Integer> dice) {
+	public static Opportunity checkSix(ArrayList<Integer> dice) {
 		ArrayList<Opportunity> choices = new ArrayList<Opportunity>();
 		// checking for six of a kind
 		Opportunity choice = checkForOfAKind(6, dice);
 		if (choice != null) {
 			choices.add(choice);
-			return choices;
 		}
 
 		// checking for 1-6 run
@@ -141,8 +140,7 @@ public class Scorer {
 			for (int i = 1; i <= 6; i++) {
 				needed.add(i);
 			}
-			choices.add(new Opportunity(needed, 1500,new ArrayList<Integer>()));
-			return choices;
+			return new Opportunity(needed, 1500,new ArrayList<Integer>());
 		}
 
 		// checking for 3 pairs
@@ -156,8 +154,7 @@ public class Scorer {
 			}
 		}
 		if (pairCount == 3) {
-			choices.add(new Opportunity(needed, 1500,new ArrayList<Integer>()));
-			return choices;
+			return new Opportunity(needed, 1500,new ArrayList<Integer>());
 		}
 
 		// checking for 2 triplets
@@ -172,8 +169,7 @@ public class Scorer {
 			}
 		}
 		if (tripleCount == 2) {
-			choices.add(new Opportunity(needed, 2500,new ArrayList<Integer>()));
-			return choices;
+			return new Opportunity(needed, 2500,new ArrayList<Integer>());
 		}
 		return null;
 	}

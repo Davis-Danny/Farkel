@@ -67,4 +67,8 @@ public class Roll {
 		diceLeft = 0;
 		throw new FarkelException();
 	}
+	
+	public void setDice(ArrayList<Integer> dice){
+		this.dice = dice;
+	}
 }
