@@ -33,7 +33,7 @@ public class Scorer {
 			ArrayList<Integer> left = choice.getLeft();
 			while(left.contains(1)){
 				oldChoices.add(choice.clone());
-				left = choice.addPoints(1, 100);
+				left = choice.addPoints(1, 50);
 			}
 			while(left.contains(5)){
 				oldChoices.add(choice.clone());
@@ -119,11 +119,10 @@ public class Scorer {
 	}
 
 	public static Opportunity checkSix(ArrayList<Integer> dice) {
-		ArrayList<Opportunity> choices = new ArrayList<Opportunity>();
 		// checking for six of a kind
 		Opportunity choice = checkForOfAKind(6, dice);
 		if (choice != null) {
-			choices.add(choice);
+			return choice;
 		}
 
 		// checking for 1-6 run

@@ -18,7 +18,7 @@ public class Tester {
 	public static int steveScore;
 
 	public static void test() {
-		tryAll(2);
+		tryAll(6);
 	}
 
 	public static void test(int iterNum) {
@@ -51,7 +51,7 @@ public class Tester {
 	}
 
 	public static void tryAll(int num) {
-		AdvancedAI dummy = new AdvancedAI("Dummy");
+		Player dummy = new AdvancedAI("Dummy");
 		Player[] dummyArray = { dummy };
 		Game dummyGame = new Game(dummyArray);
 		dummyGame.setSlow(false);
@@ -77,8 +77,12 @@ public class Tester {
 			roll.setDice(list);
 			rolls++;
 			try {
+				//get the opportunities for roll
+				//If the roll is a Farkel, throws FarkelException and moves to catch
 				choices = Scorer.score(roll);
+				//send the opportunities to a dummy AI to choose the best option
 				Roll choice = dummy.choose(choices, roll);
+				
 				if (scores.contains(choice.getScore())) {
 					int index = scores.indexOf(choice.getScore());
 					scoreCount.set(index, scoreCount.get(index) + 1);
@@ -92,8 +96,12 @@ public class Tester {
 				totalScore += choice.getScore();
 			} catch (FarkelException e) {
 				farkels++;
+				UI.output("Farkel");
 			}
+			
+			//add one to the last die
 			list.set(last, list.get(last) + 1);
+			//check every die to see if it's over six
 			for (int i = last; i >= 0; i--) {
 				if (list.get(i) > 6) {
 					if (i <= 0) {
