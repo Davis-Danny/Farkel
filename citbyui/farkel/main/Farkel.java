@@ -10,7 +10,7 @@ public class Farkel {
 	}
 
 	public static void play() {
-		Player[] players = { new Human("Danny"), new ModerateAI("Steve") };
+		Player[] players = { new Human("Danny"), new AdvancedAI("Steve") };
 		Game testGame = new Game(players);
 		testGame.play();
 	}

@@ -1,6 +1,7 @@
 package citbyui.farkel.main;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import citbyui.farkel.dice.Opportunity;
 import citbyui.farkel.dice.Roll;
@@ -16,9 +17,10 @@ public class Game {
 	boolean finalTurn = false;
 	boolean slow = true;
 	private Player winner = null;
+	public int rounds = 0;
 
 	public Game(Player[] players) {
-		this.players = players;
+		this.players = randomizeOrder(players);
 		for(Player player : players){
 			player.setGame(this);
 		}
@@ -32,6 +34,7 @@ public class Game {
 	public void play(){
 		try {
 			while (true) {
+				rounds++;
 				for (Player player : players) {
 					try {
 						playTurn(player);
@@ -97,7 +100,7 @@ public class Game {
 		player.addPoints(roll.getScore());
 		UI.output(player.getName() + " added " + roll.getScore()
 				+ " points to get a total of " + player.getScore() + "\n\n");
-		if (player.getScore() >= 10000) {
+		if (player.getScore() >= 10000 && !finalTurn) {
 			UI.output(player.getName()
 					+ " has reached 10,000 points! Everyone else has one more turn, try to beat "
 					+ player.getScore() + " points!");
@@ -118,6 +121,20 @@ public class Game {
 		for (Player player : players) {
 			UI.output(player.getName() + ": " + player.getScore());
 		}
+	}
+	public Player[] randomizeOrder(Player[] players){
+		Random rng = new Random();
+		Player[] newPlayers = new Player[players.length];
+		for(Player player : players){
+			int i;
+			do{
+				i = rng.nextInt(newPlayers.length);
+				if(newPlayers[i] == null){
+					newPlayers[i] = player;
+				}
+			}while(newPlayers[i] != player);
+		}
+		return newPlayers;
 	}
 
 	public Player[] getPlayers() {
