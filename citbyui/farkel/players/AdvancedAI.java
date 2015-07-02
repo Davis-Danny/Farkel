@@ -100,7 +100,6 @@ public class AdvancedAI extends Player {
 			UI.error("unexpected value in switch in keepRolling");
 			return false;
 		}
-
 		// Determine the best move based on the probability of farkeling, the current score,
 		// and the value of the roll.
 		double rollScore = 0 - (score * farkelChance);
@@ -109,6 +108,7 @@ public class AdvancedAI extends Player {
 
 		choice = 0 < rollScore;
 		UI.output("With "+score+" points and "+dice+" dice to roll,");
+
 		// display choice
 		if (choice) {
 			UI.output(getName() + " has chosen to keep rolling");

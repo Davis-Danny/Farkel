@@ -12,6 +12,7 @@ import citbyui.farkel.helpers.UI;
 public class TestAI0 extends AdvancedAI {
 	StatBuilder statBuilder = new StatBuilder(new Scorer());
 
+
 	public TestAI0(String name) {
 		super(name);
 	}
@@ -25,6 +26,7 @@ public class TestAI0 extends AdvancedAI {
 		double farkelChance = stats.getFarkelChance();
 		double avgScore = stats.getAvgScore();
 		double rerollChance = stats.getRerollChance();
+
 		// If it's the final turn, keep rolling until you beat the top score or
 		// farkel
 		if (isFinalTurn()) {
@@ -35,6 +37,7 @@ public class TestAI0 extends AdvancedAI {
 				}
 			}
 		}
+
 
 		// experiment- try building scores based on probability
 		double rollScore = 0 - score * farkelChance;
