@@ -12,7 +12,7 @@ public class UI {
 
 	public static boolean confirm(String message) {
 		System.out.println(message);
-		String command = scanner.nextLine();
+		String command = scanner.next();
 		ArrayList<String> yes = new ArrayList<String>();
 		ArrayList<String> no = new ArrayList<String>();
 		yes.add("Yes");
@@ -29,6 +29,7 @@ public class UI {
 			return false;
 		}else{
 			UI.output("input not recognized, try again.");
+			UI.debug("Input: "+command);
 			return confirm(message);
 		}
 	}
@@ -49,7 +50,7 @@ public class UI {
 
 	public static Opportunity choose(ArrayList<Opportunity> choices) {
 		for (Opportunity choice : choices) {
-			output("Option " + choices.indexOf(choice) + ": for "
+			output("Option " + (choices.indexOf(choice)+1) + ": for "
 					+ choice.getScore() + " points with "
 					+ choice.getLeft().size() + " dice left to roll.");
 			displayDice(choice.getNeeded());
@@ -57,7 +58,7 @@ public class UI {
 		int command;
 		do {
 			try{
-			command = scanner.nextInt();
+			command = scanner.nextInt()-1;
 			}catch(InputMismatchException e){
 				output("Invalid input. Please enter an integer");
 				command = 0;
@@ -103,10 +104,19 @@ public class UI {
 		System.out.println("Error: "+message);
 	}
 	
+	public static void debug(String message){
+		boolean debug = true;
+		if(debug){
+			UI.output(message);
+		}
+	}
+	
 	public static void pause(){
-		try {
+		/*try {
 			Thread.sleep(1000);
-		} catch (InterruptedException e) {}
+		} catch (InterruptedException e) {}*/
+		
+		scanner.nextLine();
 	}
 
 }

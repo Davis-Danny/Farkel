@@ -6,7 +6,7 @@ import citbyui.farkel.dice.Opportunity;
 import citbyui.farkel.dice.Roll;
 import citbyui.farkel.exceptions.FarkelException;
 
-public class Scorer {
+public class Scorer2 extends Scorer{
 
 	public ArrayList<Opportunity> score(Roll roll)throws FarkelException {
 		ArrayList<Opportunity> choices = new ArrayList<Opportunity>();

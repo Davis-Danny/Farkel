@@ -6,11 +6,12 @@ import citbyui.farkel.players.*;
 public class Farkel {
 
 	public static void main(String[] args) {
-		Tester.test();
+		Tester.tryAll(2);
+		
 	}
 
 	public static void play() {
-		Player[] players = { new Human("Danny"), new ModerateAI("Steve") };
+		Player[] players = { new Human("Danny"), new AdvancedAI("Steve") };
 		Game testGame = new Game(players);
 		testGame.play();
 	}

@@ -6,37 +6,31 @@ import citbyui.farkel.dice.Opportunity;
 import citbyui.farkel.dice.Roll;
 import citbyui.farkel.exceptions.FarkelException;
 import citbyui.farkel.main.Game;
-import citbyui.farkel.players.AdvancedAI;
-import citbyui.farkel.players.ModerateAI;
-import citbyui.farkel.players.Player;
-import citbyui.farkel.players.TestAI0;
-import citbyui.farkel.players.TestAI1;
+import citbyui.farkel.players.*;
 
 public class Tester {
+	static Scorer scorer = new Scorer();
 
 	public static int carlScore;
 	public static int steveScore;
 
 	public static void test() {
-		tryAll(6);
+		test(2000);
 	}
 
 	public static void test(int iterNum) {
 		carlScore = 0;
 		steveScore = 0;
+		int totalRounds = 0;
+		int leastRounds = 100;
 		for (int i = 0; i < iterNum; i++) {
-			Player[] players;
-			if (i % 2 == 1) {
-				Player[] newPlayers = { new TestAI0("Carl"),
-						new AdvancedAI("Steve") };
-				players = newPlayers;
-			} else {
-				Player[] newPlayers = { new TestAI1("Steve"),
-						new ModerateAI("Carl") };
-				players = newPlayers;
-			}
+			Player[] players = {new TestAI0("Steve"),new TestAI1("Carl")};
 			Game testGame = new Game(players, false);
 			testGame.play();
+			totalRounds += testGame.rounds;
+			if(testGame.rounds<leastRounds){
+				leastRounds = testGame.rounds;
+			}
 			if (testGame.getWinner().getName() == "Carl") {
 				carlScore++;
 			} else if (testGame.getWinner().getName() == "Steve") {
@@ -48,6 +42,8 @@ public class Tester {
 		UI.output("Win percentage: "
 				+ (100 * ((double) steveScore / (steveScore + carlScore)))
 				+ "%.");
+		UI.output("Average rounds taken:" + totalRounds/iterNum);
+		UI.output("Shortest game:"+ leastRounds + " rounds");
 	}
 
 	public static void tryAll(int num) {
@@ -79,7 +75,7 @@ public class Tester {
 			try {
 				//get the opportunities for roll
 				//If the roll is a Farkel, throws FarkelException and moves to catch
-				choices = Scorer.score(roll);
+				choices = scorer.score(roll);
 				//send the opportunities to a dummy AI to choose the best option
 				Roll choice = dummy.choose(choices, roll);
 				
@@ -121,6 +117,7 @@ public class Tester {
 		UI.output("farkels: " + farkels);
 		UI.output("Farkel chance: " + round((double) farkels / rolls) + "%");
 		UI.output("Average score: " + round(totalScore / rolls) / 100);
+		UI.output("Farkel adjusted average score: " + round(totalScore / (rolls-farkels)) / 100);
 		UI.output("Scores:");
 
 		ArrayList<ArrayList<Integer>> sorted = sort(scoreCount,scores);
@@ -160,5 +157,16 @@ public class Tester {
 		output.add(newSubject);
 		output.add(newBystander);		
 		return output;
+	}
+	
+	public static void testRounds(int iterNum) {
+		int totalRounds = 0;
+		for (int i = 0; i < iterNum; i++) {
+			Player[] players = {new AdvancedAI("Steve")};
+			Game testGame = new Game(players, false);
+			testGame.play();
+			totalRounds += testGame.rounds;
+		}
+		UI.output("Average rounds taken:" + totalRounds/iterNum);
 	}
 }
