@@ -12,13 +12,11 @@ import citbyui.farkel.helpers.UI;
 public class TestAI0 extends AdvancedAI {
 	StatBuilder statBuilder = new StatBuilder(new Scorer());
 
-
 	public TestAI0(String name) {
 		super(name);
 	}
 
-	@Override
-	public boolean keepRolling(Roll roll) {
+	public boolean worthRolling(Roll roll) {
 		Boolean choice = null;
 		int dice = roll.getDiceLeft();
 		int score = roll.getScore();
@@ -38,7 +36,6 @@ public class TestAI0 extends AdvancedAI {
 			}
 		}
 
-
 		// experiment- try building scores based on probability
 		double rollScore = 0 - score * farkelChance;
 		rollScore += avgScore * (1 - farkelChance);
@@ -50,6 +47,11 @@ public class TestAI0 extends AdvancedAI {
 			choice = true;
 		}
 
+		return choice;
+	}
+
+	public boolean keepRolling(Roll roll) {
+		boolean choice = worthRolling(roll);
 		// display choice
 		if (choice) {
 			UI.output(getName() + " has chosen to keep rolling");
@@ -61,11 +63,11 @@ public class TestAI0 extends AdvancedAI {
 		}
 		return choice;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	protected ArrayList<Opportunity> analyzeChoices(
-			ArrayList<Opportunity> choices) {
+			ArrayList<Opportunity> choices, Roll oldRoll) {
 		ArrayList<Opportunity> newChoices = new ArrayList<Opportunity>();
 		for (Opportunity choice : choices) {
 			if (choice.getLeft().size() == 0) {
@@ -77,29 +79,33 @@ public class TestAI0 extends AdvancedAI {
 		}
 		double topScore = 0;
 		Opportunity bestChoice = null;
-		
-		for(Opportunity choice : choices){
+
+		for (Opportunity choice : choices) {
+			int score = choice.getScore() + oldRoll.getScore();
 			StatBean bean = statBuilder.getBean(choice.getLeft().size());
-			double rollScore = choice.getScore(); //- choice.getScore() * bean.getFarkelChance();
-			//rollScore += bean.getAvgScore() * (1 - bean.getFarkelChance());
-			//rollScore += 450 * bean.getRerollChance();
-			rollScore = choice.getScore() + bean.getAvgScore();
-			if(rollScore >= topScore){
+			Roll roll = new Roll(choice.getLeft().size(), score);
+			double rollScore = score;
+
+			if (worthRolling(roll)) {
+				rollScore -= score * bean.getFarkelChance();
+				rollScore += bean.getAvgScore() * (1 - bean.getFarkelChance());
+				//rollScore += 450 * bean.getRerollChance();
+			}
+			if (rollScore >= topScore) {
 				bestChoice = choice;
 				topScore = rollScore;
 			}
 		}
 		/*
-		for (Opportunity choice : choices) {
-			if (choice.getScore() > topScore) {
-				bestChoice = choice;
-				topScore = choice.getScore();
-			}
-		}*/
+		 * for (Opportunity choice : choices) { if (choice.getScore() >
+		 * topScore) { bestChoice = choice; topScore = choice.getScore(); } }
+		 */
+
 		if (bestChoice != null) {
 			choices.clear();
 			choices.add(bestChoice);
 		}
+
 		return choices;
 	}
 }

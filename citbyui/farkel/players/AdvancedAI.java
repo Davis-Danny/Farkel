@@ -125,7 +125,7 @@ public class AdvancedAI extends Player {
 	public Roll choose(ArrayList<Opportunity> choices, Roll roll)
 			throws FarkelException {
 		Opportunity choice = null;
-		choices = analyzeChoices(choices);
+		choices = analyzeChoices(choices,roll);
 
 		if (choice == null) {
 			int i = rng.nextInt(choices.size());
@@ -143,7 +143,7 @@ public class AdvancedAI extends Player {
 
 	@SuppressWarnings("unchecked")
 	protected ArrayList<Opportunity> analyzeChoices(
-			ArrayList<Opportunity> choices) {
+			ArrayList<Opportunity> choices,Roll roll) {
 		ArrayList<Opportunity> newChoices = new ArrayList<Opportunity>();
 		for (Opportunity choice : choices) {
 			if (choice.getLeft().size() == 0) {
