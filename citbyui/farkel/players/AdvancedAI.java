@@ -1,25 +1,22 @@
 package citbyui.farkel.players;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import citbyui.farkel.dice.Opportunity;
 import citbyui.farkel.dice.Roll;
-import citbyui.farkel.exceptions.FarkelException;
 import citbyui.farkel.helpers.StatBean;
+import citbyui.farkel.helpers.StatBuilder;
 import citbyui.farkel.helpers.UI;
 
-public class AdvancedAI extends Player {
-	Random rng;
+public class AdvancedAI extends AI {
 
 	public AdvancedAI(String name) {
 		super(name);
-		rng = new Random();
 
 	}
 
 	@Override
-	public boolean take(Roll roll) {
+	public boolean worthTaking(Roll roll) {
 		Boolean choice = null;
 		int dice = roll.getDiceLeft();
 		int score = roll.getScore();
@@ -35,27 +32,75 @@ public class AdvancedAI extends Player {
 			UI.error("take in ModerateAI recieved unexpected roll.getDiceLeft() \n Expected: <1-6> Received: "
 					+ dice);
 		}
-		if (choice) {
-			UI.output(getName() + " has taken the roll");
-		} else {
-			UI.output(getName() + " has chosen not to take the roll");
-		}
-		if (getGame().isSlow()) {
-			UI.pause();
-		}
 		return choice;
 	}
 
-	@Override
-	public boolean keepRolling(Roll roll) {
-		double farkelChance;
-		double avgScore;
-		double rerollChance;
+	@SuppressWarnings("unchecked")
+	protected Opportunity analyzeChoices(
+			ArrayList<Opportunity> choices, Roll oldRoll) {
+
+		// if there are choices that use all the dice, set those aside
+		ArrayList<Opportunity> newChoices = new ArrayList<Opportunity>();
+		for (Opportunity choice : choices) {
+			if (choice.getLeft().size() == 0) {
+				newChoices.add(choice);
+				ArrayList<Integer> left = new ArrayList<Integer>();
+				for(int i=0;i<6;i++){
+					left.add(1);
+				}
+				choice.setLeft(left);
+			}
+		}
+
+		// if any choices were set aside, replace the full list with that one
+		if (newChoices.size() > 0) {
+			choices = (ArrayList<Opportunity>) newChoices.clone();
+		}
+
+		// iterate through all the options, assigning a score to each one
+		double topScore = 0;
+		Opportunity bestChoice = null;
+		for (Opportunity choice : choices) {
+			int score = choice.getScore() + oldRoll.getScore();
+			StatBean bean = StatBuilder.getBean(choice.getLeft().size());
+			Roll roll = new Roll(choice.getLeft().size(), score);
+			double rollScore = score;
+
+			// if we're going to roll if we choose this option, build a score
+			// based on
+			// the probability of farkeling or gaining more points
+			if (worthRolling(roll)) {
+				rollScore -= score * bean.getFarkelChance();
+				rollScore += bean.getAvgScore() * (1 - bean.getFarkelChance());
+				rollScore += 450 * bean.getRerollChance();
+			}
+
+			// if the calculated score for this option is better than any we've
+			// already found,
+			// record the score and the option
+			if (rollScore >= topScore) {
+				bestChoice = choice;
+				topScore = rollScore;
+			}
+		}
+		
+		// return the choice with the highest score
+		return bestChoice;
+	}
+
+	
+	//determine whether it's better to roll the given dice or bank
+	public boolean worthRolling(Roll roll) {
 		Boolean choice = null;
 		int dice = roll.getDiceLeft();
 		int score = roll.getScore();
+		StatBean stats = StatBuilder.getBean(dice);
+		double farkelChance = stats.getFarkelChance();
+		double avgScore = stats.getAvgScore();
+		double rerollChance = stats.getRerollChance();
+
 		// If it's the final turn, keep rolling until you beat the top score or
-		// farkel
+			//farkel
 		if (isFinalTurn()) {
 			int totalScore = getScore() + score;
 			for (Player player : getGame().getPlayers()) {
@@ -65,148 +110,12 @@ public class AdvancedAI extends Player {
 			}
 		}
 
-		switch (dice) {
-		case 1:
-			farkelChance = .6666;
-			avgScore = 25;
-			rerollChance = .3333;
-			break;
-		case 2:
-			farkelChance = .4444;
-			avgScore = 50;
-			rerollChance = .1111;
-			break;
-		case 3:
-			farkelChance = .2777;
-			avgScore = 83;
-			rerollChance = .0555;
-			break;
-		case 4:
-			farkelChance = .1574;
-			avgScore = 132;
-			rerollChance = .0401;
-			break;
-		case 5:
-			farkelChance = .0771;
-			rerollChance = .0303;
-			avgScore = 203;
-			break;
-		case 6:
-			farkelChance = .0231;
-			avgScore = 384;
-			rerollChance = .0779;
-			break;
-		default:
-			UI.error("unexpected value in switch in keepRolling");
-			return false;
-		}
-		// Determine the best move based on the probability of farkeling, the current score,
-		// and the value of the roll.
-		double rollScore = 0 - (score * farkelChance);
+		// use calculated probabilities to determine whether it is worth it to roll
+		double rollScore = 0 - score * farkelChance;
 		rollScore += avgScore * (1 - farkelChance);
 		rollScore += 450 * rerollChance;
-
 		choice = 0 < rollScore;
-		UI.output("With "+score+" points and "+dice+" dice to roll,");
-
-		// display choice
-		if (choice) {
-			UI.output(getName() + " has chosen to keep rolling");
-		} else {
-			UI.output(getName() + " has chosen not to keep rolling");
-		}
-		if (getGame().isSlow()) {
-			UI.pause();
-		}
+		
 		return choice;
-	}
-
-	@Override
-	public Roll choose(ArrayList<Opportunity> choices, Roll roll)
-			throws FarkelException {
-		Opportunity choice = null;
-		choices = analyzeChoices(choices,roll);
-
-		if (choice == null) {
-			int i = rng.nextInt(choices.size());
-			choice = choices.get(i);
-		}
-		UI.output(getName() + " is choosing:");
-		UI.displayDice(choice.getNeeded());
-		roll.setDiceLeft(choice.getLeft().size());
-		roll.addPoints(choice.getScore());
-		if (getGame().isSlow()) {
-			UI.pause();
-		}
-		return roll;
-	}
-
-	@SuppressWarnings("unchecked")
-	protected ArrayList<Opportunity> analyzeChoices(
-			ArrayList<Opportunity> choices,Roll roll) {
-		ArrayList<Opportunity> newChoices = new ArrayList<Opportunity>();
-		for (Opportunity choice : choices) {
-			if (choice.getLeft().size() == 0) {
-				newChoices.add(choice);
-			}
-		}
-		if (newChoices.size() > 0) {
-			choices = (ArrayList<Opportunity>) newChoices.clone();
-		}
-		int topScore = 0;
-		Opportunity bestChoice = null;
-		for (Opportunity choice : choices) {
-			if (choice.getScore() > topScore) {
-				bestChoice = choice;
-				topScore = choice.getScore();
-			}
-		}
-		if (bestChoice != null) {
-			choices.clear();
-			choices.add(bestChoice);
-		}
-		return choices;
-	}
-
-	public StatBean getStats(int dice) {
-		double farkelChance;
-		int avgScore;
-		double rerollChance;
-		switch (dice) {
-		case 1:
-			farkelChance = .6666;
-			avgScore = 25;
-			rerollChance = .3333;
-			break;
-		case 2:
-			farkelChance = .4444;
-			avgScore = 50;
-			rerollChance = .1111;
-			break;
-		case 3:
-			farkelChance = .2777;
-			avgScore = 83;
-			rerollChance = .0555;
-			break;
-		case 4:
-			farkelChance = .1574;
-			avgScore = 132;
-			rerollChance = .0401;
-			break;
-		case 5:
-			farkelChance = .0771;
-			rerollChance = .0303;
-			avgScore = 203;
-			break;
-		case 6:
-			farkelChance = .0231;
-			avgScore = 384;
-			rerollChance = .0779;
-			break;
-		default:
-			UI.error("unexpected value in switch in keepRolling");
-			return null;
-		}
-		return new StatBean(farkelChance,avgScore,rerollChance);
 	}
 }

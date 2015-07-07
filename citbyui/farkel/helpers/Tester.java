@@ -1,6 +1,7 @@
 package citbyui.farkel.helpers;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import citbyui.farkel.dice.Opportunity;
 import citbyui.farkel.dice.Roll;
@@ -15,20 +16,23 @@ public class Tester {
 	public static int steveScore;
 
 	public static void test() {
-		test(2000);
+		test(50000);
 	}
 
 	public static void test(int iterNum) {
+		long startTime = System.nanoTime();
 		carlScore = 0;
 		steveScore = 0;
+		UI.setDisplay(false);
 		int totalRounds = 0;
 		int leastRounds = 100;
+		int percentComplete = 0;
 		for (int i = 0; i < iterNum; i++) {
-			Player[] players = {new TestAI0("Steve"),new TestAI1("Carl")};
+			Player[] players = { new TestAI0("Steve"), new AdvancedAI("Carl") };
 			Game testGame = new Game(players, false);
 			testGame.play();
 			totalRounds += testGame.rounds;
-			if(testGame.rounds<leastRounds){
+			if (testGame.rounds < leastRounds) {
 				leastRounds = testGame.rounds;
 			}
 			if (testGame.getWinner().getName() == "Carl") {
@@ -36,14 +40,24 @@ public class Tester {
 			} else if (testGame.getWinner().getName() == "Steve") {
 				steveScore++;
 			}
+			if (i % (iterNum / 25) == (iterNum / 25 - 1)) {
+				percentComplete += 4;
+				UI.debug((i + 1) + " games complete. (" + percentComplete
+						+ "%)");
+			}
 		}
+		UI.setDisplay(true);
+		long endTime = System.nanoTime();
+		long elapsedTime = endTime - startTime;
+		long time = TimeUnit.NANOSECONDS.toSeconds(elapsedTime);
+		UI.output("Completed " + iterNum + " games in " + time + " seconds.");
 		UI.output("Final scores: \n Steve: " + steveScore + "\n Carl: "
 				+ carlScore);
 		UI.output("Win percentage: "
 				+ (100 * ((double) steveScore / (steveScore + carlScore)))
 				+ "%.");
-		UI.output("Average rounds taken:" + totalRounds/iterNum);
-		UI.output("Shortest game:"+ leastRounds + " rounds");
+		UI.output("Average rounds taken:" + totalRounds / iterNum);
+		UI.output("Shortest game:" + leastRounds + " rounds");
 	}
 
 	public static void tryAll(int num) {
@@ -73,12 +87,14 @@ public class Tester {
 			roll.setDice(list);
 			rolls++;
 			try {
-				//get the opportunities for roll
-				//If the roll is a Farkel, throws FarkelException and moves to catch
+				// get the opportunities for roll
+				// If the roll is a Farkel, throws FarkelException and moves to
+				// catch
 				choices = scorer.score(roll);
-				//send the opportunities to a dummy AI to choose the best option
+				// send the opportunities to a dummy AI to choose the best
+				// option
 				Roll choice = dummy.choose(choices, roll);
-				
+
 				if (scores.contains(choice.getScore())) {
 					int index = scores.indexOf(choice.getScore());
 					scoreCount.set(index, scoreCount.get(index) + 1);
@@ -94,10 +110,10 @@ public class Tester {
 				farkels++;
 				UI.output("Farkel");
 			}
-			
-			//add one to the last die
+
+			// add one to the last die
 			list.set(last, list.get(last) + 1);
-			//check every die to see if it's over six
+			// check every die to see if it's over six
 			for (int i = last; i >= 0; i--) {
 				if (list.get(i) > 6) {
 					if (i <= 0) {
@@ -117,10 +133,11 @@ public class Tester {
 		UI.output("farkels: " + farkels);
 		UI.output("Farkel chance: " + round((double) farkels / rolls) + "%");
 		UI.output("Average score: " + round(totalScore / rolls) / 100);
-		UI.output("Farkel adjusted average score: " + round(totalScore / (rolls-farkels)) / 100);
+		UI.output("Farkel adjusted average score: "
+				+ round(totalScore / (rolls - farkels)) / 100);
 		UI.output("Scores:");
 
-		ArrayList<ArrayList<Integer>> sorted = sort(scoreCount,scores);
+		ArrayList<ArrayList<Integer>> sorted = sort(scoreCount, scores);
 		scores = sorted.get(1);
 		scoreCount = sorted.get(0);
 		for (int i = 0; i < scores.size(); i++) {
@@ -128,7 +145,6 @@ public class Tester {
 					+ round((double) scoreCount.get(i) / rolls) + "%");
 		}
 	}
-	
 
 	public static double round(double input) {
 		double output = input;
@@ -137,15 +153,16 @@ public class Tester {
 		output /= 100;
 		return output;
 	}
-	
-	public static ArrayList<ArrayList<Integer>> sort(ArrayList<Integer> subject,ArrayList<Integer> bystander){
+
+	public static ArrayList<ArrayList<Integer>> sort(
+			ArrayList<Integer> subject, ArrayList<Integer> bystander) {
 		ArrayList<Integer> newSubject = new ArrayList<Integer>();
 		ArrayList<Integer> newBystander = new ArrayList<Integer>();
-		while(!subject.isEmpty()){
+		while (!subject.isEmpty()) {
 			int topNum = 0;
 			int index = 0;
-			for(int num:subject){
-				if(num>topNum){
+			for (int num : subject) {
+				if (num > topNum) {
 					topNum = num;
 					index = subject.indexOf(num);
 				}
@@ -155,18 +172,18 @@ public class Tester {
 		}
 		ArrayList<ArrayList<Integer>> output = new ArrayList<ArrayList<Integer>>();
 		output.add(newSubject);
-		output.add(newBystander);		
+		output.add(newBystander);
 		return output;
 	}
-	
+
 	public static void testRounds(int iterNum) {
 		int totalRounds = 0;
 		for (int i = 0; i < iterNum; i++) {
-			Player[] players = {new AdvancedAI("Steve")};
+			Player[] players = { new AdvancedAI("Steve") };
 			Game testGame = new Game(players, false);
 			testGame.play();
 			totalRounds += testGame.rounds;
 		}
-		UI.output("Average rounds taken:" + totalRounds/iterNum);
+		UI.output("Average rounds taken:" + totalRounds / iterNum);
 	}
 }

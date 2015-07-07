@@ -5,10 +5,9 @@ import java.util.Random;
 
 import citbyui.farkel.dice.Opportunity;
 import citbyui.farkel.dice.Roll;
-import citbyui.farkel.exceptions.FarkelException;
 import citbyui.farkel.helpers.UI;
 
-public class ModerateAI extends Player {
+public class ModerateAI extends AI {
 	Random rng;
 
 	public ModerateAI(String name) {
@@ -18,7 +17,7 @@ public class ModerateAI extends Player {
 	}
 
 	@Override
-	public boolean take(Roll roll) {
+	public boolean worthTaking(Roll roll) {
 		Boolean choice = null;
 		int dice = roll.getDiceLeft();
 		int score = roll.getScore();
@@ -33,19 +32,11 @@ public class ModerateAI extends Player {
 		}else{
 			UI.error("take in ModerateAI recieved unexpected roll.getDiceLeft() \n Expected: <1-6> Received: "+dice);
 		}
-		if(choice){
-			UI.output(getName()+" has taken the roll");
-		}else{
-			UI.output(getName()+" has chosen not to take the roll");
-		}
-		if(getGame().isSlow()){
-			UI.pause();
-		}
 		return choice;
 	}
 	
 	@Override
-	public boolean keepRolling(Roll roll){
+	public boolean worthRolling(Roll roll){
 		Boolean choice = null;
 		int dice = roll.getDiceLeft();
 		int score = roll.getScore();
@@ -68,39 +59,12 @@ public class ModerateAI extends Player {
 		}else{
 			UI.error("keepRolling in ModerateAI recieved unexpected roll.getDiceLeft() \n Expected: <1-6> Received: "+dice);
 		}
-		if(choice){
-			UI.output(getName()+" has chosen to keep rolling");
-		}else{
-			UI.output(getName()+" has chosen not to keep rolling");
-		}
-		if(getGame().isSlow()){
-			UI.pause();
-		}
 		return choice;
 	}
 
-	@Override
-	public Roll choose(ArrayList<Opportunity> choices, Roll roll)
-			throws FarkelException {
-		Opportunity choice = null;
-		choices = analyzeChoices(choices);
-
-		if (choice == null) {
-			int i = rng.nextInt(choices.size());
-			choice = choices.get(i);
-		}
-		UI.output(getName() + " is choosing:");
-		UI.displayDice(choice.getNeeded());
-		roll.setDiceLeft(choice.getLeft().size());
-		roll.addPoints(choice.getScore());
-		if(getGame().isSlow()){
-			UI.pause();
-		}
-		return roll;
-	}
-
 	@SuppressWarnings("unchecked")
-	private ArrayList<Opportunity> analyzeChoices(ArrayList<Opportunity> choices) {
+	@Override
+	protected Opportunity analyzeChoices(ArrayList<Opportunity> choices,Roll oldRoll) {
 		ArrayList<Opportunity> newChoices = new ArrayList<Opportunity>();
 		for (Opportunity choice : choices) {
 			if (choice.getLeft().size() == 0) {
@@ -118,11 +82,7 @@ public class ModerateAI extends Player {
 				topScore = choice.getScore();
 			}
 		}
-		if (bestChoice != null) {
-			choices.clear();
-			choices.add(bestChoice);
-		}
-		return choices;
+		return bestChoice;
 	}
 
 }

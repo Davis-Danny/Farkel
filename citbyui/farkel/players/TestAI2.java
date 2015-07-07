@@ -1,6 +1,7 @@
 package citbyui.farkel.players;
 
 import citbyui.farkel.dice.Roll;
+import citbyui.farkel.helpers.StatBuilder;
 
 public class TestAI2 extends AdvancedAI {
 
@@ -10,7 +11,7 @@ public class TestAI2 extends AdvancedAI {
 	
 	@Override
 	public boolean keepRolling(Roll roll){
-		if((35750/roll.getScore())>getStats(roll.getDiceLeft()).getFarkelChance()*100){
+		if((35750/roll.getScore())>StatBuilder.getBean(roll.getDiceLeft()).getFarkelChance()*100){
 			return true;
 		}else{
 			return false;

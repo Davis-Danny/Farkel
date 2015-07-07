@@ -5,10 +5,8 @@ import java.util.Random;
 
 import citbyui.farkel.dice.Opportunity;
 import citbyui.farkel.dice.Roll;
-import citbyui.farkel.exceptions.FarkelException;
-import citbyui.farkel.helpers.UI;
 
-public class BasicAI extends Player {
+public class BasicAI extends AI {
 	Random rng;
 
 	public BasicAI(String name) {
@@ -16,28 +14,23 @@ public class BasicAI extends Player {
 		rng = new Random();
 
 	}
-
+	
 	@Override
-	public boolean take(Roll roll) {
-		boolean choice = rng.nextBoolean();
-		if(choice){
-			UI.output(getName()+" has taken the roll");
-		}else{
-			UI.output(getName()+" has chosen not to take the roll");
-		}
+	protected Opportunity analyzeChoices(ArrayList<Opportunity> choices,
+			Roll oldRoll) {
+		int i = rng.nextInt(choices.size());
+		Opportunity choice = choices.get(i);
 		return choice;
 	}
 
 	@Override
-	public Roll choose(ArrayList<Opportunity> choices, Roll roll)
-			throws FarkelException {
-		int i = rng.nextInt(choices.size());
-		Opportunity choice = choices.get(i);
-		UI.output(getName() + " is choosing:");
-		UI.displayDice(choice.getNeeded());
-		roll.setDiceLeft(choice.getLeft().size());
-		roll.addPoints(choice.getScore());
-		return roll;
+	public boolean worthRolling(Roll roll) {
+		return rng.nextBoolean();
+	}
+
+	@Override
+	public boolean worthTaking(Roll roll) {
+		return rng.nextBoolean();
 	}
 
 }
