@@ -1,7 +1,8 @@
-package citbyui.farkel.players;
+package citbyui.farkel.players.testAI;
 
 import citbyui.farkel.dice.Roll;
-import citbyui.farkel.helpers.StatBuilder;
+import citbyui.farkel.players.AdvancedAI;
+import citbyui.farkel.stats.StatBuilder;
 
 public class TestAI2 extends AdvancedAI {
 

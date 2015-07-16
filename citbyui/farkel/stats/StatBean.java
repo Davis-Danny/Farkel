@@ -1,13 +1,23 @@
-package citbyui.farkel.helpers;
+package citbyui.farkel.stats;
 
 public class StatBean {
 	double farkelChance;
 	int avgScore;
 	double rerollChance;
-	public StatBean(double farkelChance,int avgScore,double rerollChance) {
+	double rollWorth;
+	public double getRollWorth() {
+		return rollWorth;
+	}
+
+	public void setRollWorth(double rollWorth) {
+		this.rollWorth = rollWorth;
+	}
+
+	public StatBean(double farkelChance,int avgScore,double rerollChance,double rollWorth) {
 		setFarkelChance(farkelChance);
 		setAvgScore(avgScore);
 		setRerollChance(rerollChance);
+		setRollWorth(rollWorth);
 	}
 	
 	public double getFarkelChance() {

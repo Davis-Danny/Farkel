@@ -1,4 +1,6 @@
-package citbyui.farkel.players;
+package citbyui.farkel.players.testAI;
+
+import citbyui.farkel.players.AdvancedAI;
 
 public class TestAI1 extends AdvancedAI {
 

@@ -21,7 +21,7 @@ public class Game {
 	Scorer scorer = new Scorer();
 
 	public Game(Player[] players) {
-		this.players = randomizeOrder(players);
+		this.players = players;
 		for(Player player : players){
 			player.setGame(this);
 		}
@@ -42,6 +42,7 @@ public class Game {
 					} catch (FarkelException e) {
 						lastRoll = null;
 						UI.output("Farkel! \n \n");
+						player.getStats().addTurn(0);
 						if (slow) {
 							UI.pause();
 						}
@@ -108,6 +109,7 @@ public class Game {
 			player.setFinalTurn(true);
 			finalTurn = true;
 		}
+		player.getStats().addTurn(roll.getScore());
 	}
 
 	public void finish() {

@@ -8,6 +8,8 @@ import citbyui.farkel.dice.Roll;
 import citbyui.farkel.exceptions.FarkelException;
 import citbyui.farkel.main.Game;
 import citbyui.farkel.players.*;
+import citbyui.farkel.players.testAI.*;
+import citbyui.farkel.stats.PlayerStats;
 
 public class Tester {
 	static Scorer scorer = new Scorer();
@@ -16,10 +18,13 @@ public class Tester {
 	public static int steveScore;
 
 	public static void test() {
-		test(50000);
+		test(30000);
 	}
 
 	public static void test(int iterNum) {
+		Player steve = new ModerateAI2("Steve");
+		Player carl = new ModerateAI("Carl");
+		Player[] players = { steve,carl };
 		long startTime = System.nanoTime();
 		carlScore = 0;
 		steveScore = 0;
@@ -28,8 +33,20 @@ public class Tester {
 		int leastRounds = 100;
 		int percentComplete = 0;
 		for (int i = 0; i < iterNum; i++) {
-			Player[] players = { new TestAI0("Steve"), new AdvancedAI("Carl") };
+			if(i%2==0){
+				Player[] newPlayers = {steve,carl};
+				players = newPlayers;
+			}else{
+				Player[] newPlayers = {carl,steve};
+				players = newPlayers;
+			}
 			Game testGame = new Game(players, false);
+			for (Player player : players) {
+				player.setScore(0);
+				player.setFinalTurn(false);
+			}
+			carl.setScore(8000);
+			steve.setScore(5000);
 			testGame.play();
 			totalRounds += testGame.rounds;
 			if (testGame.rounds < leastRounds) {
@@ -58,6 +75,22 @@ public class Tester {
 				+ "%.");
 		UI.output("Average rounds taken:" + totalRounds / iterNum);
 		UI.output("Shortest game:" + leastRounds + " rounds");
+		PlayerStats stats = steve.getStats();
+		ArrayList<Integer> scores = stats.getScores();
+		int totalScore = 0;
+		int scoringRolls = 0;
+		UI.output("total number of rounds: "+stats.getTotalRounds());
+		for (int i = 0; i < scores.size(); i++) {
+			if (scores.get(i) > 100) {
+				//UI.output(i * 50 + ": " + scores.get(i)+" ("+(round(((double)scores.get(i)/stats.getTotalRounds())*100))+"%)" );
+			}
+			totalScore += scores.get(i)*i*50;
+			if(i!=0){
+				scoringRolls += scores.get(i);
+			}
+		}
+		UI.output("average score per round:"+totalScore/stats.getTotalRounds());
+		UI.output("average score per scoring round: "+totalScore/scoringRolls);
 	}
 
 	public static void tryAll(int num) {
@@ -71,6 +104,8 @@ public class Tester {
 		int totalScore = 0;
 		ArrayList<Integer> scores = new ArrayList<Integer>();
 		ArrayList<Integer> scoreCount = new ArrayList<Integer>();
+		ArrayList<Integer> left = new ArrayList<Integer>();
+		ArrayList<Integer> leftCount = new ArrayList<Integer>();
 		Roll roll;
 		ArrayList<Integer> list;
 		ArrayList<Opportunity> choices;
@@ -81,6 +116,7 @@ public class Tester {
 		}
 		boolean repeat = true;
 		int last = list.size() - 1;
+		UI.setDisplay(false);
 		while (repeat) {
 			roll = new Roll();
 			UI.displayDice(list);
@@ -101,6 +137,13 @@ public class Tester {
 				} else {
 					scoreCount.add(1);
 					scores.add(choice.getScore());
+				}
+				if (left.contains(choice.getDiceLeft())) {
+					int index = left.indexOf(choice.getDiceLeft());
+					leftCount.set(index, leftCount.get(index) + 1);
+				} else {
+					leftCount.add(1);
+					left.add(choice.getDiceLeft());
 				}
 				if (choice.getDiceLeft() == 6) {
 					rerolls++;
@@ -126,7 +169,7 @@ public class Tester {
 				}
 			}
 		}
-
+		UI.setDisplay(true);
 		UI.output("Rolls:" + rolls);
 		UI.output("Rerolls:" + rerolls + " Probability: "
 				+ round((double) rerolls / rolls) + "%");
@@ -144,11 +187,20 @@ public class Tester {
 			UI.output((scores.get(i) + ": " + scoreCount.get(i) + " Probability: ")
 					+ round((double) scoreCount.get(i) / rolls) + "%");
 		}
+		UI.output("Dice Left Counts:");
+
+		sorted = sort(leftCount, left);
+		left = sorted.get(1);
+		leftCount = sorted.get(0);
+		for (int i = 0; i < left.size(); i++) {
+			UI.output((left.get(i) + ": " + leftCount.get(i) + " Probability: ")
+					+ round((double) leftCount.get(i) / rolls) + "%");
+		}
 	}
 
 	public static double round(double input) {
 		double output = input;
-		output *= 10000;
+		output *= 100;
 		output = Math.floor(output);
 		output /= 100;
 		return output;

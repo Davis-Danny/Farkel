@@ -1,10 +1,12 @@
-package citbyui.farkel.helpers;
+package citbyui.farkel.stats;
 
 import java.util.ArrayList;
 
 import citbyui.farkel.dice.Opportunity;
 import citbyui.farkel.dice.Roll;
 import citbyui.farkel.exceptions.FarkelException;
+import citbyui.farkel.helpers.Scorer;
+import citbyui.farkel.helpers.UI;
 import citbyui.farkel.main.Game;
 import citbyui.farkel.players.AdvancedAI;
 import citbyui.farkel.players.Player;
@@ -122,8 +124,34 @@ public class StatBuilder {
 		double rerollChance = round((double) rerolls / rolls);
 		double farkelChance = round((double) farkels / rolls);
 		int avgScore = (int) (round(totalScore / rolls));
+		
+		double rollWorth;
+		switch(num){
+			case 1:
+				rollWorth = 66.5;
+				break;
+			case 2:
+				rollWorth = 67.2;
+				break;
+			case 3:
+				rollWorth = 98.5;
+				break;
+			case 4:
+				rollWorth = 168.2;
+				break;
+			case 5:
+				rollWorth = 292.5;
+				break;
+			case 6:
+				rollWorth = 573;
+				break;
+			default:
+				UI.error("unexpected value in UI.buildbean");
+				return null;
+		}	
+		
 
-		return new StatBean(farkelChance, avgScore, rerollChance);
+		return new StatBean(farkelChance, avgScore, rerollChance,rollWorth);
 
 	}
 
@@ -142,4 +170,5 @@ public class StatBuilder {
 	public static void setBuilt(boolean built) {
 		StatBuilder.built = built;
 	}
+	
 }

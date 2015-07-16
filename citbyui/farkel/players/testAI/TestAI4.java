@@ -1,15 +1,17 @@
-package citbyui.farkel.players;
+package citbyui.farkel.players.testAI;
 
 import java.util.ArrayList;
 
 import citbyui.farkel.dice.Opportunity;
 import citbyui.farkel.dice.Roll;
+import citbyui.farkel.players.AI;
+import citbyui.farkel.players.Player;
 import citbyui.farkel.stats.StatBean;
 import citbyui.farkel.stats.StatBuilder;
 
-public class AdvancedAI extends AI {
+public class TestAI4 extends AI {
 
-	public AdvancedAI(String name) {
+	public TestAI4(String name) {
 		super(name);
 
 	}
@@ -33,6 +35,7 @@ public class AdvancedAI extends AI {
 		return offered >= newRoll;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Opportunity analyzeChoices(
 			ArrayList<Opportunity> choices, Roll oldRoll) {
 
@@ -51,7 +54,7 @@ public class AdvancedAI extends AI {
 
 		// if any choices were set aside, replace the full list with that one
 		if (newChoices.size() > 0) {
-			choices = newChoices;
+			choices = (ArrayList<Opportunity>) newChoices.clone();
 		}
 
 		// iterate through all the options, assigning a score to each one

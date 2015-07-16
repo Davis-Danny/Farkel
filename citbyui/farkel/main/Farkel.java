@@ -6,7 +6,7 @@ import citbyui.farkel.players.*;
 public class Farkel {
 
 	public static void main(String[] args) {
-		play();
+		Tester.test();
 		
 	}
 

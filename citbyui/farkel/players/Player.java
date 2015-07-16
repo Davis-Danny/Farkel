@@ -6,16 +6,19 @@ import citbyui.farkel.dice.Opportunity;
 import citbyui.farkel.dice.Roll;
 import citbyui.farkel.exceptions.FarkelException;
 import citbyui.farkel.main.Game;
+import citbyui.farkel.stats.PlayerStats;
 
 public abstract class Player {
 	private boolean finalTurn = false;
 	private int score;
 	private String name;
 	private Game game;
+	private PlayerStats stats;
 	
 	public Player(String name){
 		score = 0;
 		this.name = name;
+		setStats(new PlayerStats(this));
 	}
 	
 	public int getScore(){
@@ -52,5 +55,17 @@ public abstract class Player {
 	
 	public Game getGame(){
 		return game;
+	}
+
+	public PlayerStats getStats() {
+		return stats;
+	}
+
+	public void setStats(PlayerStats stats) {
+		this.stats = stats;
+	}
+	
+	public void setScore(int newScore){
+		score = newScore;
 	}
 }
