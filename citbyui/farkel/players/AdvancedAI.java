@@ -94,6 +94,11 @@ public class AdvancedAI extends AI {
 		double farkelChance = stats.getFarkelChance();
 		stats.getAvgScore();
 		stats.getRerollChance();
+		
+		// If the player's score and the roll's score is less than 500, keep rolling
+		if(getScore()+score<500){
+			return true;
+		}
 
 		// If it's the final turn, keep rolling until you beat the top score or
 			//farkel

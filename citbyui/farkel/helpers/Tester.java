@@ -22,7 +22,7 @@ public class Tester {
 	}
 
 	public static void test(int iterNum) {
-		Player steve = new ModerateAI2("Steve");
+		Player steve = new AdvancedAI("Steve");
 		Player carl = new ModerateAI("Carl");
 		Player[] players = { steve,carl };
 		long startTime = System.nanoTime();
@@ -45,8 +45,8 @@ public class Tester {
 				player.setScore(0);
 				player.setFinalTurn(false);
 			}
-			carl.setScore(8000);
-			steve.setScore(5000);
+			carl.setScore(0);
+			steve.setScore(0);
 			testGame.play();
 			totalRounds += testGame.rounds;
 			if (testGame.rounds < leastRounds) {

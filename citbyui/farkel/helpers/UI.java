@@ -45,6 +45,18 @@ public class UI {
 		System.out.println(message);
 		return scanner.nextInt();
 	}
+	
+	public static String stringPrompt(String message){
+		UI.output(message);
+		String command = scanner.next();
+		try{
+			return command;
+		}catch(Exception e){
+			UI.output("input not recognized, try again.");
+			UI.debug("Input: " + command);
+			return stringPrompt(message);
+		}
+	}
 
 	public static void displayRoll(Player player, ArrayList<Integer> dice) {
 		if (display) {
